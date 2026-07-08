@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 10 Trials Before You Can Say Yes ❤️</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #ff6b9d, #c44dff, #7c3aed, #a855f7);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#bgCanvas {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+}
+
+#progressContainer {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 4px;
+  z-index: 100;
+  background: rgba(255,255,255,0.15);
+}
+
+#progressBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff6b9d, #fbbf24);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#questionCounter {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+#cardWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  min-height: 360px;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 28px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.2);
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  opacity: 0;
+  transform: scale(0.85) translateY(30px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.card.active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.card.exit {
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+}
+
+#questionText {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 32px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.btnGroup {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 14px 36px;
+  border: none;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  white-space: nowrap;
+}
+
+.btnYes {
+  background: linear-gradient(135deg, #ff6b9d, #ff4d7a);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(255,77,122,0.4);
+}
+
+.btnYes:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 30px rgba(255,77,122,0.6);
+}
+
+.btnYes:active { transform: scale(0.96); }
+
+.btnNo {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+}
+
+.btnNo:hover { background: rgba(255,255,255,0.18); }
+
+/* Final Screen */
+#finalScreen {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+#finalScreen.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#finalCanvas {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+}
+
+#finalContent {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+}
+
+#glowingHeart {
+  font-size: 80px;
+  animation: heartPulse 1.5s ease-in-out infinite;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 0 30px rgba(255,77,122,0.6));
+}
+
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+#typewriterText {
+  color: rgba(255,255,255,0.9);
+  font-size: 18px;
+  line-height: 1.8;
+  font-weight: 400;
+  min-height: 320px;
+  text-align: left;
+  margin: 0 auto 32px;
+  max-width: 500px;
+  white-space: pre-wrap;
+}
+
+#typewriterText .cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: #ff6b9d;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+#finalButtons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.finalBtn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff6b9d, #ff4d7a);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(255,77,122,0.4);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.finalBtn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(255,77,122,0.6); }
+
+/* Music Button */
+#musicBtn {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 100;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#musicBtn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+/* Modal */
+#modalOverlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 300;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#modalOverlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#modalBox {
+  background: rgba(30,10,30,0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#modalOverlay.visible #modalBox { transform: scale(1); }
+
+#modalTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ff6b9d;
+  margin-bottom: 12px;
+}
+
+#modalText {
+  color: rgba(255,255,255,0.8);
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+#modalBtn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff6b9d, #ff4d7a);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+#modalBtn:hover { transform: scale(1.05); }
+
+/* Confirm Dialog */
+#confirmOverlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 350;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#confirmOverlay.visible { opacity: 1; pointer-events: auto; }
+
+#confirmBox {
+  background: rgba(30,10,30,0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#confirmOverlay.visible #confirmBox { transform: scale(1); }
+
+#confirmText {
+  color: rgba(255,255,255,0.85);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.confirmBtns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirmBtn {
+  padding: 10px 28px;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.confirmBtnYes {
+  background: linear-gradient(135deg, #ff6b9d, #ff4d7a);
+  color: #fff;
+}
+
+.confirmBtnNo {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.confirmBtn:hover { transform: scale(1.05); }
+
+/* Toast */
+#toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  z-index: 500;
+  background: rgba(30,10,30,0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 20px 36px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#toast.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* Idle Bubble */
+#idleBubble {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 50;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 12px 24px;
+  color: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.5s ease;
+  pointer-events: none;
+}
+
+#idleBubble.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Loading spinner */
+#loadingOverlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 400;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#loadingOverlay.visible { opacity: 1; pointer-events: auto; }
+
+#loadingSpinner {
+  width: 60px; height: 60px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top-color: #ff6b9d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 520px) {
+  .card { padding: 28px 20px; }
+  #questionText { font-size: 20px; }
+  .btn { padding: 12px 28px; font-size: 16px; }
+  #typewriterText { font-size: 16px; min-height: 280px; }
+  #glowingHeart { font-size: 60px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div id="app">
+  <div id="progressContainer"><div id="progressBar"></div></div>
+  <div id="questionCounter">Question 1 of 10</div>
+  <button id="musicBtn" title="Toggle Music">🎵</button>
+
+  <div id="cardWrapper">
+    <div class="card active" id="card0">
+      <div id="questionText"></div>
+      <div class="btnGroup">
+        <button class="btn btnYes" id="yesBtn">YES ❤️</button>
+        <button class="btn btnNo" id="noBtn">NO 💔</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="finalScreen">
+  <canvas id="finalCanvas"></canvas>
+  <div id="finalContent">
+    <div id="glowingHeart">❤️</div>
+    <div id="typewriterText"></div>
+    <div id="finalButtons"></div>
+  </div>
+</div>
+
+<div id="modalOverlay">
+  <div id="modalBox">
+    <div id="modalTitle"></div>
+    <div id="modalText"></div>
+    <button id="modalBtn">OK ❤️</button>
+  </div>
+</div>
+
+<div id="confirmOverlay">
+  <div id="confirmBox">
+    <div id="confirmText"></div>
+    <div class="confirmBtns">
+      <button class="confirmBtn confirmBtnYes" id="confirmYes">YES</button>
+      <button class="confirmBtn confirmBtnNo" id="confirmNo">NO</button>
+    </div>
+  </div>
+</div>
+
+<div id="loadingOverlay"><div id="loadingSpinner"></div></div>
+
+<div id="toast"></div>
+<div id="idleBubble">Still thinking? I'll wait... ❤️</div>
+
+<!-- Placeholder for audio: add a local music file -->
+<!-- <audio id="bgMusic" src="music.mp3" loop></audio> -->
+
+<script>
+const questions = [
+  {
+    text: 'Do you like me? ❤️',
+    noType: 'runaway'
+  },
+  {
+    text: 'Will you be my favorite notification? 📱',
+    noType: 'fakeError'
+  },
+  {
+    text: 'Are you absolutely sure you don\'t want to choose YES?',
+    noType: 'confirmChain'
+  },
+  {
+    text: 'Will you send me your pic daily? 📸',
+    noType: 'shrink'
+  },
+  {
+    text: 'Can I always make you smile? 😊',
+    noType: 'textChange'
+  },
+  {
+    text: 'Can I steal your hoodie? 🧥',
+    noType: 'magnet'
+  },
+  {
+    text: 'Will you always reply to my texts? 💬',
+    noType: 'virusWarning'
+  },
+  {
+    text: 'Choose wisely... ⏳',
+    noType: 'countdown'
+  },
+  {
+    text: 'Can I keep making you smile forever? 😊',
+    noType: 'emojiChange'
+  },
+  {
+    text: 'Will you stay with me forever? ❤️',
+    noType: 'boss'
+  }
+];
+
+// State
+let currentQuestion = 0;
+let noClickCount = 0;
+let questionNoClicks = new Array(10).fill(0);
+let noTextIndex = 0;
+let confirmStep = 0;
+let countdownActive = false;
+let idleTimer = null;
+let isIdle = false;
+let musicPlaying = false;
+let bossSpecialTimer = null;
+let bossFakePopupCount = 0;
+let bossCloneActive = false;
+let isTransitioning = false;
+
+const dom = {
+  card: document.querySelector('.card'),
+  questionText: document.getElementById('questionText'),
+  yesBtn: document.getElementById('yesBtn'),
+  noBtn: document.getElementById('noBtn'),
+  progressBar: document.getElementById('progressBar'),
+  questionCounter: document.getElementById('questionCounter'),
+  finalScreen: document.getElementById('finalScreen'),
+  typewriterText: document.getElementById('typewriterText'),
+  finalButtons: document.getElementById('finalButtons'),
+  glowingHeart: document.getElementById('glowingHeart'),
+  modalOverlay: document.getElementById('modalOverlay'),
+  modalTitle: document.getElementById('modalTitle'),
+  modalText: document.getElementById('modalText'),
+  modalBtn: document.getElementById('modalBtn'),
+  confirmOverlay: document.getElementById('confirmOverlay'),
+  confirmText: document.getElementById('confirmText'),
+  confirmYes: document.getElementById('confirmYes'),
+  confirmNo: document.getElementById('confirmNo'),
+  toast: document.getElementById('toast'),
+  idleBubble: document.getElementById('idleBubble'),
+  musicBtn: document.getElementById('musicBtn'),
+  bgCanvas: document.getElementById('bgCanvas'),
+  finalCanvas: document.getElementById('finalCanvas'),
+  loadingOverlay: document.getElementById('loadingOverlay'),
+  cardWrapper: document.getElementById('cardWrapper')
+};
+
+const noTexts = ['No', 'Really?', 'Think Again', 'Please?', 'Pretty Please?', '🥺', 'Come On...', 'Fine...', 'Okay... 😭'];
+const emojiSequence = ['🙂', '😐', '🥺', '😭', '🐶', '💔'];
+const bossMessages = ['404', 'Access Denied', 'Think Again', 'Nice Try', 'Mission Failed', 'Love Wins', 'Nope', 'Try Again', 'Not Today', 'Wrong Choice'];
+
+// Background Canvas
+const ctx = dom.bgCanvas.getContext('2d');
+let bgParticles = [];
+let bgW, bgH;
+
+function resizeBg() {
+  bgW = dom.bgCanvas.width = window.innerWidth;
+  bgH = dom.bgCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeBg);
+resizeBg();
+
+class BgParticle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * bgW;
+    this.y = Math.random() * bgH;
+    this.size = Math.random() * (this.type === 'heart' ? 14 : this.type === 'sparkle' ? 3 : this.type === 'glow' ? 40 : 2) + 2;
+    this.speedY = -(Math.random() * 0.3 + 0.1);
+    this.speedX = (Math.random() - 0.5) * 0.2;
+    this.opacity = Math.random() * 0.3 + 0.1;
+    this.life = Math.random() * 300 + 200;
+    this.maxLife = this.life;
+    this.type = ['heart', 'sparkle', 'glow', 'particle'][Math.floor(Math.random() * 4)];
+    this.phase = Math.random() * Math.PI * 2;
+    this.rotation = Math.random() * Math.PI * 2;
+    switch (this.type) {
+      case 'heart': this.size = Math.random() * 10 + 6; break;
+      case 'sparkle': this.size = Math.random() * 1.5 + 1; break;
+      case 'glow': this.size = Math.random() * 30 + 15; break;
+      case 'particle': this.size = Math.random() * 1.5 + 0.5; break;
+    }
+    this.baseSize = this.size;
+  }
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX + Math.sin(this.phase) * 0.15;
+    this.phase += 0.01;
+    this.life--;
+    const lifeRatio = this.life / this.maxLife;
+    this.opacity = lifeRatio * 0.3;
+    if (this.type === 'glow') this.size = this.baseSize * (0.8 + 0.2 * Math.sin(this.phase * 2));
+    if (this.life <= 0 || this.y < -50 || this.x < -50 || this.x > bgW + 50) this.reset();
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.translate(this.x, this.y);
+    switch (this.type) {
+      case 'heart':
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = '#ff6b9d';
+        ctx.beginPath();
+        ctx.moveTo(0, this.size * 0.25);
+        ctx.bezierCurveTo(-this.size * 0.5, -this.size * 0.25, -this.size, this.size * 0.1, 0, this.size);
+        ctx.bezierCurveTo(this.size, this.size * 0.1, this.size * 0.5, -this.size * 0.25, 0, this.size * 0.25);
+        ctx.fill();
+        break;
+      case 'sparkle':
+        ctx.fillStyle = '#fbbf24';
+        const s = this.size;
+        ctx.beginPath();
+        for (let i = 0; i < 4; i++) {
+          const a = (i / 4) * Math.PI * 2 - Math.PI / 2;
+          const a2 = a + Math.PI / 4;
+          ctx.lineTo(Math.cos(a) * s, Math.sin(a) * s);
+          ctx.lineTo(Math.cos(a2) * s * 0.4, Math.sin(a2) * s * 0.4);
+        }
+        ctx.closePath();
+        ctx.fill();
+        break;
+      case 'glow':
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+        grad.addColorStop(0, 'rgba(196, 77, 255, 0.4)');
+        grad.addColorStop(1, 'rgba(196, 77, 255, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      case 'particle':
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+    }
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 80; i++) {
+  const p = new BgParticle();
+  p.life = Math.random() * 500;
+  p.maxLife = p.life;
+  bgParticles.push(p);
+}
+
+function animateBg() {
+  ctx.clearRect(0, 0, bgW, bgH);
+  bgParticles.forEach(p => { p.update(); p.draw(ctx); });
+  requestAnimationFrame(animateBg);
+}
+animateBg();
+
+// Final Canvas (confetti + stars)
+const fctx = dom.finalCanvas.getContext('2d');
+let fw, fh;
+function resizeFinal() {
+  fw = dom.finalCanvas.width = window.innerWidth;
+  fh = dom.finalCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeFinal);
+resizeFinal();
+
+let confettiParticles = [];
+let starParticles = [];
+let finalAnimRunning = false;
+
+class Confetti {
+  constructor() {
+    this.x = Math.random() * fw;
+    this.y = -20;
+    this.w = Math.random() * 10 + 5;
+    this.h = Math.random() * 6 + 3;
+    this.color = ['#ff6b9d','#fbbf24','#c44dff','#34d399','#60a5fa','#f472b6','#fb923c'][Math.floor(Math.random() * 7)];
+    this.speedY = Math.random() * 2 + 1.5;
+    this.speedX = (Math.random() - 0.5) * 2;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.1;
+    this.opacity = 1;
+  }
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.rotation += this.rotSpeed;
+    if (this.y > fh + 20) { this.y = -20; this.x = Math.random() * fw; }
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
+    ctx.restore();
+  }
+}
+
+class Star {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    this.x = Math.random() * fw;
+    this.y = Math.random() * fh;
+    this.size = Math.random() * 2 + 1;
+    this.twinkleSpeed = Math.random() * 0.03 + 0.01;
+    this.phase = Math.random() * Math.PI * 2;
+  }
+  update() {
+    this.phase += this.twinkleSpeed;
+  }
+  draw(ctx) {
+    const brightness = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(this.phase));
+    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function initStars() {
+  starParticles = [];
+  for (let i = 0; i < 100; i++) starParticles.push(new Star());
+}
+
+function startConfetti() {
+  confettiParticles = [];
+  for (let i = 0; i < 120; i++) confettiParticles.push(new Confetti());
+}
+
+function animateFinal() {
+  if (!finalAnimRunning) return;
+  fctx.clearRect(0, 0, fw, fh);
+  starParticles.forEach(s => { s.update(); s.draw(fctx); });
+  confettiParticles.forEach(c => { c.update(); c.draw(fctx); });
+  requestAnimationFrame(animateFinal);
+}
+
+// Question Logic
+function showQuestion(index) {
+  countdownActive = false;
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
+  const q = questions[index];
+  dom.questionText.textContent = q.text;
+  dom.noBtn.textContent = 'NO 💔';
+  dom.noBtn.style.cssText = '';
+  dom.noBtn.disabled = false;
+  dom.noBtn.style.display = '';
+  noTextIndex = 0;
+  confirmStep = 0;
+  questionNoClicks[index] = 0;
+  noClickCount = 0;
+
+  dom.progressBar.style.width = ((index + 1) / 10 * 100) + '%';
+  dom.questionCounter.textContent = `Question ${index + 1} of 10`;
+
+  // Reset no button for specific behaviors
+  if (q.noType === 'shrink') {
+    dom.noBtn.style.transform = 'scale(1) rotate(0deg)';
+    dom.noBtn.style.opacity = '1';
+  }
+  if (q.noType === 'countdown') {
+    startCountdown();
+  }
+  if (q.noType === 'boss') {
+    dom.noBtn.textContent = 'NO 💔';
+    startBossBehavior();
+  }
+}
+
+function transitionToQuestion(index) {
+  if (isTransitioning) return;
+  isTransitioning = true;
+  const card = dom.card;
+  card.classList.remove('active');
+  card.classList.add('exit');
+  setTimeout(() => {
+    showQuestion(index);
+    card.classList.remove('exit');
+    card.classList.add('active');
+    isTransitioning = false;
+  }, 400);
+}
+
+function handleYes() {
+  if (isTransitioning) return;
+  if (countdownActive && questions[currentQuestion].noType !== 'countdown') return;
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; countdownActive = false; }
+
+  if (currentQuestion === 9) {
+    showFinalScreen();
+    return;
+  }
+
+  currentQuestion++;
+  transitionToQuestion(currentQuestion);
+  resetIdleTimer();
+}
+
+// NO Button Behaviors
+function handleNo() {
+  if (isTransitioning) return;
+  const q = questions[currentQuestion];
+  questionNoClicks[currentQuestion]++;
+  noClickCount = questionNoClicks[currentQuestion];
+
+  if (noClickCount > 10) {
+    showToast("You're incredibly determined 😂");
+  }
+
+  const behavior = q.noType;
+  switch (behavior) {
+    case 'runaway': runawayNo(); break;
+    case 'fakeError': showFakeError(); break;
+    case 'confirmChain': startConfirmChain(); break;
+    case 'shrink': shrinkNo(); break;
+    case 'textChange': changeNoText(); break;
+    case 'magnet': runawayNo(); break;
+    case 'virusWarning': showVirusWarning(); break;
+    case 'countdown': break;
+    case 'emojiChange': emojiNo(); break;
+    case 'boss': bossNo(); break;
+  }
+  resetIdleTimer();
+}
+
+function runawayNo() {
+  const card = dom.cardWrapper.getBoundingClientRect();
+  const btn = dom.noBtn;
+  const bRect = btn.getBoundingClientRect();
+  const cardCenterX = card.left + card.width / 2;
+  const cardCenterY = card.top + card.height / 2;
+
+  let x = Math.random() * (card.width - bRect.width - 40) + 20;
+  let y = Math.random() * (card.height - bRect.height - 40) + 20;
+
+  const btnX = bRect.left - card.left;
+  const btnY = bRect.top - card.top;
+  const dx = x - btnX;
+  const dy = y - btnY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (dist < 60) {
+    x = Math.max(20, Math.min(card.width - bRect.width - 40, x + (dx || 1) * 80));
+    y = Math.max(20, Math.min(card.height - bRect.height - 40, y + (dy || 1) * 80));
+  }
+
+  btn.style.position = 'relative';
+  btn.style.left = x + 'px';
+  btn.style.top = y + 'px';
+  btn.style.transition = 'left 0.35s ease, top 0.35s ease';
+}
+
+function showFakeError() {
+  dom.modalTitle.textContent = 'ERROR 403';
+  dom.modalText.textContent = 'Negative responses are currently unavailable.\nPlease choose YES.';
+  dom.modalBtn.textContent = 'OK ❤️';
+  dom.modalOverlay.classList.add('visible');
+  dom.modalBtn.onclick = () => dom.modalOverlay.classList.remove('visible');
+}
+
+let confirmChainActive = false;
+function startConfirmChain() {
+  if (confirmChainActive) return;
+  confirmChainActive = true;
+  confirmStep = 0;
+  showConfirmDialog(confirmStep);
+}
+
+function showConfirmDialog(step) {
+  const messages = ['Are you sure?', 'Really sure?', 'This decision may cause sadness.'];
+  if (step >= 3) {
+    confirmChainActive = false;
+    return;
+  }
+  dom.confirmText.textContent = messages[step];
+  dom.confirmOverlay.classList.add('visible');
+
+  dom.confirmYes.onclick = () => {
+    dom.confirmOverlay.classList.remove('visible');
+    confirmChainActive = false;
+  };
+
+  dom.confirmNo.onclick = () => {
+    dom.confirmOverlay.classList.remove('visible');
+    confirmStep++;
+    if (confirmStep >= 3) {
+      confirmChainActive = false;
+    } else {
+      setTimeout(() => showConfirmDialog(confirmStep), 200);
+    }
+  };
+}
+
+function shrinkNo() {
+  const btn = dom.noBtn;
+  const currentScale = parseFloat(btn.style.transform?.match(/scale\(([\d.]+)\)/)?.[1]) || 1;
+  const currentRotate = parseFloat(btn.style.transform?.match(/rotate\(([-\d.]+)deg\)/)?.[1]) || 0;
+  const currentOpacity = parseFloat(btn.style.opacity) || 1;
+
+  const newScale = Math.max(0.05, currentScale - 0.12);
+  const newRotate = currentRotate + (Math.random() > 0.5 ? 15 : -15);
+  const newOpacity = Math.max(0.1, currentOpacity - 0.12);
+
+  btn.style.transform = `scale(${newScale}) rotate(${newRotate}deg)`;
+  btn.style.opacity = newOpacity;
+  btn.style.marginLeft = (Math.random() - 0.5) * 30 + 'px';
+  btn.style.marginTop = (Math.random() - 0.5) * 30 + 'px';
+}
+
+function changeNoText() {
+  if (noTextIndex < noTexts.length) {
+    dom.noBtn.textContent = noTexts[noTextIndex];
+    noTextIndex++;
+  } else {
+    dom.noBtn.style.display = 'none';
+  }
+}
+
+function showVirusWarning() {
+  const existingBox = document.getElementById('virusBox');
+  if (existingBox) existingBox.remove();
+
+  const box = document.createElement('div');
+  box.id = 'virusBox';
+  box.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 350; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+  `;
+  box.innerHTML = `
+    <div style="background:rgba(30,10,30,0.96); backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,0.15); border-radius:24px; padding:32px;
+      max-width:380px; width:90%; text-align:center;">
+      <div style="font-size:22px; font-weight:700; color:#ff6b9d; margin-bottom:12px;">⚠️ LOVE.EXE</div>
+      <div style="color:rgba(255,255,255,0.8); font-size:16px; line-height:1.6; margin-bottom:24px;">
+        LOVE.EXE has stopped responding.<br><br>Repair relationship?
+      </div>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button class="virusRepair" style="padding:12px 28px; border:none; border-radius:50px;
+          font-size:15px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#ff6b9d,#ff4d7a);
+          color:#fff; transition:all 0.3s ease;">Repair ❤️</button>
+        <button class="virusRepair" style="padding:12px 28px; border:none; border-radius:50px;
+          font-size:15px; font-weight:600; cursor:pointer; background:linear-gradient(135deg,#ff6b9d,#ff4d7a);
+          color:#fff; transition:all 0.3s ease;">Repair ❤️</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(box);
+  box.querySelectorAll('.virusRepair').forEach(b => {
+    b.addEventListener('click', () => box.remove());
+    b.addEventListener('mouseenter', () => { b.style.transform = 'scale(1.05)'; });
+    b.addEventListener('mouseleave', () => { b.style.transform = 'scale(1)'; });
+  });
+}
+
+let countdownInterval = null;
+function startCountdown() {
+  if (countdownActive) return;
+  countdownActive = true;
+  let count = 5;
+  dom.yesBtn.disabled = false;
+  dom.questionText.textContent = `Choose wisely... ⏳\n\n${count}...`;
+
+  countdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      dom.questionText.textContent = `Choose wisely... ⏳\n\n${count}...`;
+    } else {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      dom.questionText.textContent = `Choose wisely... ⏳\n\nDecision made by destiny ❤️`;
+      setTimeout(() => {
+        countdownActive = false;
+        handleYes();
+      }, 1200);
+    }
+  }, 1000);
+}
+
+function emojiNo() {
+  if (noTextIndex < emojiSequence.length) {
+    dom.noBtn.textContent = emojiSequence[noTextIndex];
+    noTextIndex++;
+  } else {
+    dom.questionText.textContent = 'Can I keep making you smile forever? 😊\n\nI knew your heart would pick YES ❤️';
+    dom.noBtn.style.display = 'none';
+  }
+}
+
+// Boss Level (Question 10)
+function startBossBehavior() {
+  if (currentQuestion !== 9) return;
+  bossSpecialTimer = setInterval(() => {
+    const r = Math.random();
+    if (r < 0.2) {
+      const msg = bossMessages[Math.floor(Math.random() * bossMessages.length)];
+      showFloatingMessage(msg);
+    } else if (r < 0.35) {
+      showFakeLoader();
+    } else if (r < 0.45) {
+      bossFakePopupCount++;
+      if (bossFakePopupCount <= 2) showFakeBossPopup();
+    } else if (r < 0.55 && !bossCloneActive) {
+      cloneBossNoButton();
+    }
+    runawayNo();
+  }, 2000);
+}
+
+function showFloatingMessage(msg) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.cssText = `
+    position: fixed; z-index: 150; font-size: 14px; font-weight: 700;
+    color: #fbbf24; pointer-events: none;
+    text-shadow: 0 0 10px rgba(251,191,36,0.5);
+    transition: all 1.5s ease;
+  `;
+  const btn = dom.noBtn.getBoundingClientRect();
+  el.style.left = (btn.left + Math.random() * 60 - 30) + 'px';
+  el.style.top = (btn.top - 20) + 'px';
+  el.style.opacity = '1';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => {
+    el.style.transform = 'translateY(-60px)';
+    el.style.opacity = '0';
+  });
+  setTimeout(() => el.remove(), 2000);
+}
+
+function showFakeLoader() {
+  dom.loadingOverlay.classList.add('visible');
+  setTimeout(() => dom.loadingOverlay.classList.remove('visible'), 800);
+}
+
+function showFakeBossPopup() {
+  dom.modalTitle.textContent = '😈 Nice Try';
+  dom.modalText.textContent = 'You really thought that would work?';
+  dom.modalBtn.textContent = 'Okay... ❤️';
+  dom.modalOverlay.classList.add('visible');
+  dom.modalBtn.onclick = () => dom.modalOverlay.classList.remove('visible');
+}
+
+function cloneBossNoButton() {
+  if (bossCloneActive) return;
+  bossCloneActive = true;
+  const clone = dom.noBtn.cloneNode(true);
+  clone.className = 'btn btnNo clone';
+  clone.style.position = 'absolute';
+  clone.style.left = (Math.random() * 200 - 100) + 'px';
+  clone.style.top = (Math.random() * 100 - 50) + 'px';
+  clone.style.opacity = '0.6';
+  clone.style.transform = 'scale(0.8)';
+  clone.style.transition = 'all 1s ease';
+  clone.textContent = 'NO 💔';
+  clone.addEventListener('click', handleNo);
+  dom.cardWrapper.appendChild(clone);
+  setTimeout(() => {
+    clone.style.opacity = '0';
+    clone.style.transform = 'scale(0.3)';
+    setTimeout(() => { clone.remove(); bossCloneActive = false; }, 1000);
+  }, 1500);
+}
+
+function bossNo() {
+  runawayNo();
+  shrinkNo();
+  changeNoText();
+  dom.noBtn.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+}
+
+// Final Screen
+function showFinalScreen() {
+  if (bossSpecialTimer) { clearInterval(bossSpecialTimer); bossSpecialTimer = null; }
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
+  dom.finalScreen.classList.add('visible');
+  finalAnimRunning = true;
+  initStars();
+  startConfetti();
+  animateFinal();
+
+  const letter = `Congratulations ❤️
+
+You completed all ten trials.
+
+You smiled.
+You chased buttons.
+You survived fake errors.
+You tried your best to say no...
+
+But somehow destiny had other plans.
+
+Thank you for making this little journey so much fun.
+
+I hope every laugh you had while playing this reminds you how special you are to me.
+
+And yes...
+
+I'm still going to ask for your picture every single day. 📸❤️
+
+Thank you for existing.
+
+Love You Forever ❤️`;
+
+  typeWriter(letter, () => {
+    dom.finalButtons.innerHTML = `
+      <button class="finalBtn" onclick="replayGame()">❤️ Replay</button>
+      <button class="finalBtn" onclick="oneMoreHug()">❤️ One More Hug</button>
+    `;
+  });
+}
+
+function typeWriter(text, callback) {
+  const el = dom.typewriterText;
+  el.innerHTML = '';
+  let i = 0;
+  const cursorSpan = document.createElement('span');
+  cursorSpan.className = 'cursor';
+  el.appendChild(cursorSpan);
+
+  function type() {
+    if (i < text.length) {
+      const char = text[i];
+      if (char === '\n') {
+        el.insertBefore(document.createElement('br'), cursorSpan);
+      } else {
+        el.insertBefore(document.createTextNode(char), cursorSpan);
+      }
+      i++;
+      setTimeout(type, 35);
+    } else if (callback) {
+      cursorSpan.style.display = 'none';
+      callback();
+    }
+  }
+  type();
+}
+
+function replayGame() {
+  dom.finalScreen.classList.remove('visible');
+  finalAnimRunning = false;
+  dom.typewriterText.innerHTML = '';
+  dom.finalButtons.innerHTML = '';
+  dom.glowingHeart.style.display = '';
+  currentQuestion = 0;
+  questionNoClicks = new Array(10).fill(0);
+  transitionToQuestion(0);
+  resetIdleTimer();
+}
+
+function oneMoreHug() {
+  dom.finalButtons.innerHTML = '';
+  dom.glowingHeart.style.display = 'none';
+  dom.typewriterText.textContent = '';
+  dom.typewriterText.style.textAlign = 'center';
+  dom.typewriterText.style.fontSize = '24px';
+  dom.typewriterText.style.fontWeight = '700';
+  dom.typewriterText.style.color = '#ff6b9d';
+  dom.typewriterText.textContent = '❤️'.repeat(50);
+
+  const container = dom.finalContent;
+  for (let i = 0; i < 60; i++) {
+    const heart = document.createElement('div');
+    heart.textContent = '❤️';
+    heart.style.cssText = `
+      position: absolute; font-size: ${Math.random() * 30 + 10}px;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+      transition: all ${Math.random() * 1.5 + 1}s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      z-index: 2;
+    `;
+    container.appendChild(heart);
+    requestAnimationFrame(() => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * 300 + 100;
+      heart.style.transform = `translate(${Math.cos(angle) * dist - 25}px, ${Math.sin(angle) * dist - 25}px) scale(1)`;
+      heart.style.opacity = '0';
+    });
+    setTimeout(() => heart.remove(), 3000);
+  }
+  setTimeout(() => {
+    dom.finalButtons.innerHTML = `<button class="finalBtn" onclick="replayGame()">❤️ Replay</button>`;
+    dom.typewriterText.style.textAlign = '';
+    dom.typewriterText.style.fontSize = '';
+    dom.typewriterText.style.fontWeight = '';
+    dom.typewriterText.style.color = '';
+    dom.glowingHeart.style.display = '';
+  }, 3500);
+}
+
+// Toast
+let toastTimer = null;
+function showToast(msg) {
+  dom.toast.textContent = msg;
+  dom.toast.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => dom.toast.classList.remove('visible'), 2500);
+}
+
+// Idle Detection
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  isIdle = false;
+  dom.idleBubble.classList.remove('visible');
+  idleTimer = setTimeout(() => {
+    if (!dom.finalScreen.classList.contains('visible')) {
+      isIdle = true;
+      dom.idleBubble.classList.add('visible');
+    }
+  }, 15000);
+}
+
+// Easter Eggs
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    showToast("Escape isn't possible here ❤️");
+  }
+  if (e.key === 'Alt' || e.key === 'F4') {
+    showToast('Nice try 😆');
+  }
+});
+
+// Music Button
+dom.musicBtn.addEventListener('click', () => {
+  musicPlaying = !musicPlaying;
+  dom.musicBtn.textContent = musicPlaying ? '🎵' : '🎵';
+  if (musicPlaying) {
+    // To add music, uncomment the <audio> tag and set src to your music file
+    // const audio = document.getElementById('bgMusic');
+    // if (audio) { audio.play(); }
+    dom.musicBtn.style.boxShadow = '0 0 20px rgba(255,77,122,0.4)';
+  } else {
+    // const audio = document.getElementById('bgMusic');
+    // if (audio) { audio.pause(); }
+    dom.musicBtn.style.boxShadow = 'none';
+  }
+});
+
+// Mouse move for magnet behavior (Q6)
+document.addEventListener('mousemove', (e) => {
+  if (currentQuestion === 5 || currentQuestion === 9) {
+    const btn = dom.noBtn;
+    const bRect = btn.getBoundingClientRect();
+    const btnCenterX = bRect.left + bRect.width / 2;
+    const btnCenterY = bRect.top + bRect.height / 2;
+    const dx = e.clientX - btnCenterX;
+    const dy = e.clientY - btnCenterY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 120 && dist > 0) {
+      const card = dom.cardWrapper.getBoundingClientRect();
+      const relX = btn.offsetLeft || 0;
+      const relY = btn.offsetTop || 0;
+      const pushX = -(dx / dist) * 80;
+      const pushY = -(dy / dist) * 80;
+      const newX = Math.max(20, Math.min(card.width - bRect.width - 40, (relX || 0) + pushX));
+      const newY = Math.max(20, Math.min(card.height - bRect.height - 40, (relY || 0) + pushY));
+      btn.style.position = 'relative';
+      btn.style.left = newX + 'px';
+      btn.style.top = newY + 'px';
+      btn.style.transition = 'left 0.25s ease, top 0.25s ease';
+    }
+  }
+
+  // Runaway for Q1
+  if (currentQuestion === 0 || currentQuestion === 9) {
+    const btn = dom.noBtn;
+    const bRect = btn.getBoundingClientRect();
+    const btnCenterX = bRect.left + bRect.width / 2;
+    const btnCenterY = bRect.top + bRect.height / 2;
+    const dx = e.clientX - btnCenterX;
+    const dy = e.clientY - btnCenterY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 100) {
+      const card = dom.cardWrapper.getBoundingClientRect();
+      const x = Math.random() * (card.width - 120) + 10;
+      const y = Math.random() * (card.height - 60) + 10;
+      btn.style.position = 'relative';
+      btn.style.left = x + 'px';
+      btn.style.top = y + 'px';
+      btn.style.transition = 'left 0.2s ease, top 0.2s ease';
+    }
+  }
+});
+
+// Touch support for runaway/magnet
+document.addEventListener('touchmove', (e) => {
+  const touch = e.touches[0];
+  if (!touch) return;
+  const mouseEvent = new MouseEvent('mousemove', {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  document.dispatchEvent(mouseEvent);
+}, { passive: true });
+
+// YES button
+dom.yesBtn.addEventListener('click', handleYes);
+// NO button
+dom.noBtn.addEventListener('click', handleNo);
+
+// Modal overlay close on backdrop click
+dom.modalOverlay.addEventListener('click', (e) => {
+  if (e.target === dom.modalOverlay) dom.modalOverlay.classList.remove('visible');
+});
+dom.confirmOverlay.addEventListener('click', (e) => {
+  if (e.target === dom.confirmOverlay) dom.confirmOverlay.classList.remove('visible');
+});
+
+// Init
+resizeBg();
+initStars();
+showQuestion(0);
+resetIdleTimer();
+</script>
+</body>
+</html>
