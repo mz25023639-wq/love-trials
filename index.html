@@ -486,13 +486,91 @@ body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Footer */
+#footer {
+  position: fixed;
+  bottom: 0; left: 0; width: 100%;
+  z-index: 50;
+  text-align: center;
+  padding: 10px 16px 12px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+#footer span {
+  color: rgba(255,255,255,0.75);
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 520px) {
-  .card { padding: 28px 20px; }
-  #questionText { font-size: 20px; }
-  .btn { padding: 12px 28px; font-size: 16px; }
-  #typewriterText { font-size: 16px; min-height: 280px; }
-  #glowingHeart { font-size: 60px; }
+  .card { padding: 28px 18px; }
+  #questionText { font-size: 20px; margin-bottom: 24px; }
+  .btn { padding: 12px 24px; font-size: 16px; }
+  .btnYes { box-shadow: 0 4px 16px rgba(255,77,122,0.35); }
+  #typewriterText { font-size: 16px; min-height: 260px; }
+  #glowingHeart { font-size: 56px; }
+  #questionCounter { font-size: 12px; padding: 5px 14px; top: 12px; }
+  #musicBtn { top: 52px; right: 12px; width: 38px; height: 38px; font-size: 17px; }
+  #cardWrapper { min-height: 300px; }
+  #finalContent { padding: 16px; }
+  .finalBtn { padding: 12px 24px; font-size: 16px; }
+  #toast { font-size: 16px; padding: 16px 28px; max-width: 85%; }
+  #idleBubble { font-size: 12px; padding: 10px 18px; bottom: 56px; }
+}
+
+@media (max-width: 400px) {
+  .card { padding: 22px 14px; border-radius: 22px; }
+  #questionText { font-size: 17px; margin-bottom: 20px; }
+  .btn { padding: 10px 18px; font-size: 14px; min-width: 80px; }
+  .btnGroup { gap: 10px; }
+  #cardWrapper { min-height: 260px; }
+  #glowingHeart { font-size: 44px; }
+  #typewriterText { font-size: 14px; min-height: 220px; }
+  .finalBtn { padding: 10px 20px; font-size: 14px; }
+  #questionCounter { font-size: 11px; padding: 4px 12px; }
+  #musicBtn { top: 48px; right: 10px; width: 34px; height: 34px; font-size: 15px; }
+  #footer { font-size: 10px; padding: 8px 12px 10px; }
+}
+
+@media (max-width: 360px) {
+  .card { padding: 18px 12px; border-radius: 18px; }
+  #questionText { font-size: 15px; }
+  .btn { padding: 8px 14px; font-size: 12px; min-width: 70px; }
+  #cardWrapper { min-height: 220px; }
+}
+
+/* Landscape phone */
+@media (max-height: 500px) and (orientation: landscape) {
+  #app { padding: 10px; }
+  .card { padding: 16px 20px; }
+  #questionText { font-size: 16px; margin-bottom: 14px; }
+  .btn { padding: 8px 18px; font-size: 13px; }
+  #cardWrapper { min-height: 180px; }
+  #questionCounter { top: 6px; font-size: 10px; padding: 3px 10px; }
+  #musicBtn { top: 40px; right: 10px; width: 30px; height: 30px; font-size: 13px; }
+  #footer { padding: 4px 12px 6px; font-size: 9px; }
+  #idleBubble { bottom: 40px; }
+}
+
+/* Touch devices - bigger tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .btn { min-height: 44px; }
+  .finalBtn { min-height: 44px; }
+  #musicBtn { width: 44px; height: 44px; }
+}
+
+/* Ensure content is not hidden behind footer */
+@media (max-width: 520px) {
+  #app { padding-bottom: 50px; }
+  #idleBubble { bottom: 56px; }
 }
 </style>
 </head>
@@ -547,6 +625,8 @@ body {
 
 <div id="toast"></div>
 <div id="idleBubble">Still thinking? I'll wait... ❤️</div>
+
+<div id="footer">Made for <span>EZZA G</span> ❤️ by <span>MUHAMMAD ZEESHAN</span></div>
 
 <!-- Placeholder for audio: add a local music file -->
 <!-- <audio id="bgMusic" src="music.mp3" loop></audio> -->
